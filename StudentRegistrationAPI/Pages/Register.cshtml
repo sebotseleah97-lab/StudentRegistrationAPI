@@ -1,0 +1,30 @@
+﻿@page
+@model StudentRegistration.Pages.RegisterModel
+@{
+    ViewData["Title"] = "Register Student";
+}
+
+<h2>Register New Student</h2>
+
+<form method="post">
+    <div>
+        <label>Full Name</label><br />
+        <input asp-for="Student.FullName" />
+    </div>
+    <div>
+        <label>Email</label><br />
+        <input asp-for="Student.Email" type="email" />
+    </div>
+    <div>
+        <label>Phone Number</label><br />
+        <input asp-for="Student.PhoneNumber" />
+    </div>
+    <br />
+    <button type="submit">Register</button>
+</form>
+
+@* Show success or error message *@
+@if (Model.Message != null)
+{
+    <p style="color:green">@Model.Message</p>
+}

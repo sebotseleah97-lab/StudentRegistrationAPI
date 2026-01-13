@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;   // Required for async EF Core calls
-using StudentRegistration.Data;       // Make sure this matches your Data folder namespace
-using StudentRegistration.Models;     // Make sure this matches your Models folder namespace
+using Microsoft.EntityFrameworkCore;
 using StudentRegistrationAPI.Data;
-using System.Threading.Tasks;         // Required for async Task
+using StudentRegistration.Models;
+using System.Threading.Tasks;
 
 namespace StudentRegistration.Controllers
 {
@@ -13,7 +12,6 @@ namespace StudentRegistration.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        // Constructor injects the database context
         public StudentsController(ApplicationDbContext context)
         {
             _context = context;
@@ -21,23 +19,60 @@ namespace StudentRegistration.Controllers
 
         // GET: api/Students
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllStudents()
         {
-            var students = await _context.Student.ToListAsync();
+            var students = await _context.Students.ToListAsync();
             return Ok(students);
+        }
+
+        // GET: api/Students/1
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetStudent(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+
+            if (student == null)
+                return NotFound();
+
+            return Ok(student);
         }
 
         // POST: api/Students
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] Student student)
+        public async Task<IActionResult> AddStudent(Student student)
         {
-            if (student == null)
-                return BadRequest("Student data is required.");
-
-            _context.Student.Add(student);
+            _context.Students.Add(student);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetAll), new { id = student.Id }, student);
+            return CreatedAtAction(nameof(GetStudent), new { id = student.Id }, student);
+        }
+
+        // PUT: api/Students/1
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateStudent(int id, Student student)
+        {
+            if (id != student.Id)
+                return BadRequest();
+
+            _context.Entry(student).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // DELETE: api/Students/1
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStudent(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+
+            if (student == null)
+                return NotFound();
+
+            _context.Students.Remove(student);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
